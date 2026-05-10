@@ -1,0 +1,432 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<meta name="apple-mobile-web-app-title" content="LolaSottoTavolo">
+<title>LolaSottoTavolo 🐾</title>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:wght@400;600&family=DM+Sans:wght@400;500&display=swap" rel="stylesheet">
+<style>
+:root {
+  --pink: #F9C8D6;
+  --pink-dark: #C4637E;
+  --pink-deep: #8B3A52;
+  --teal: #A8DDD3;
+  --teal-dark: #2D8C7E;
+  --teal-deep: #1A5C52;
+  --cream: #FDF8F2;
+  --brown: #3D2B1F;
+  --gray: #8A8078;
+  --border: #E8E0D8;
+  --white: #FFFFFF;
+  --radius: 16px;
+  --radius-sm: 10px;
+}
+* { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
+body { font-family: 'DM Sans', sans-serif; background: var(--cream); color: var(--brown); min-height: 100vh; }
+h1,h2,h3 { font-family: 'Fraunces', serif; }
+.app-header { background: var(--white); border-bottom: 1px solid var(--border); padding: 14px 20px; display: flex; align-items: center; justify-content: space-between; position: sticky; top: 0; z-index: 50; }
+.logo { display: flex; align-items: center; gap: 8px; }
+.logo-paw { font-size: 24px; }
+.logo h1 { font-size: 20px; font-weight: 600; color: var(--brown); }
+.header-search { display: flex; align-items: center; gap: 8px; }
+.search-input { border: 1px solid var(--border); border-radius: 20px; padding: 6px 14px; font-size: 13px; font-family: 'DM Sans', sans-serif; background: var(--cream); color: var(--brown); width: 160px; outline: none; }
+.search-input:focus { border-color: var(--teal-dark); }
+.nav-tabs { display: flex; background: var(--white); border-bottom: 1px solid var(--border); padding: 0 20px; gap: 4px; overflow-x: auto; }
+.nav-tab { padding: 10px 16px; font-size: 13px; font-weight: 500; color: var(--gray); border-bottom: 2px solid transparent; cursor: pointer; white-space: nowrap; transition: all .2s; background: none; border-top: none; border-left: none; border-right: none; font-family: 'DM Sans', sans-serif; }
+.nav-tab.active { color: var(--teal-deep); border-bottom-color: var(--teal-dark); }
+.filters { padding: 14px 20px 8px; display: flex; gap: 8px; overflow-x: auto; }
+.chip { padding: 6px 14px; border-radius: 20px; border: 1px solid var(--border); background: var(--white); color: var(--gray); font-size: 12px; font-weight: 500; cursor: pointer; white-space: nowrap; transition: all .2s; font-family: 'DM Sans', sans-serif; }
+.chip.active-teal { background: var(--teal); border-color: var(--teal-dark); color: var(--teal-deep); }
+.chip.active-pink { background: var(--pink); border-color: var(--pink-dark); color: var(--pink-deep); }
+.grid-wrap { padding: 8px 16px 100px; }
+.recipe-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(160px, 1fr)); gap: 14px; }
+.recipe-card { background: var(--white); border-radius: var(--radius); border: 1px solid var(--border); overflow: hidden; cursor: pointer; transition: transform .2s, box-shadow .2s; }
+.recipe-card:active { transform: scale(0.97); }
+.card-hero { height: 100px; display: flex; align-items: center; justify-content: center; font-size: 44px; position: relative; }
+.card-hero.sweet { background: var(--pink); }
+.card-hero.savory { background: var(--teal); }
+.card-badge { position: absolute; top: 7px; right: 7px; font-size: 9px; font-weight: 500; padding: 2px 7px; border-radius: 10px; }
+.badge-easy { background: rgba(255,255,255,0.85); color: var(--teal-deep); }
+.badge-time { position: absolute; top: 7px; left: 7px; font-size: 9px; font-weight: 500; padding: 2px 7px; border-radius: 10px; background: rgba(255,255,255,0.85); color: var(--gray); }
+.card-body { padding: 10px 12px; }
+.card-title { font-size: 12px; font-weight: 500; line-height: 1.4; margin-bottom: 4px; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
+.card-meta { font-size: 10px; color: var(--gray); }
+.card-source { font-size: 9px; color: var(--gray); margin-top: 2px; opacity: 0.7; }
+.detail-view { display: none; position: fixed; inset: 0; background: var(--cream); z-index: 100; overflow-y: auto; }
+.detail-view.open { display: block; }
+.detail-hero { height: 200px; display: flex; align-items: center; justify-content: center; font-size: 90px; position: relative; }
+.detail-hero.sweet { background: var(--pink); }
+.detail-hero.savory { background: var(--teal); }
+.detail-back { position: absolute; top: 16px; left: 16px; background: rgba(255,255,255,0.9); border: none; border-radius: 20px; padding: 6px 14px; font-size: 13px; font-weight: 500; cursor: pointer; font-family: 'DM Sans', sans-serif; color: var(--brown); }
+.detail-body { padding: 20px; max-width: 600px; margin: 0 auto; }
+.detail-title { font-size: 24px; font-weight: 600; line-height: 1.2; margin-bottom: 6px; }
+.detail-meta { font-size: 13px; color: var(--gray); margin-bottom: 6px; }
+.detail-source { font-size: 11px; color: var(--gray); margin-bottom: 16px; opacity: 0.7; }
+.pill-list { display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: 20px; }
+.pill { font-size: 11px; padding: 4px 11px; border-radius: 20px; background: var(--cream); border: 1px solid var(--border); color: var(--brown); }
+.section-label { font-size: 10px; font-weight: 500; text-transform: uppercase; letter-spacing: .6px; color: var(--gray); margin-bottom: 10px; }
+.steps-list { margin-bottom: 20px; }
+.step-item { display: flex; gap: 12px; padding: 10px 0; border-bottom: 1px solid var(--border); }
+.step-item:last-child { border-bottom: none; }
+.step-num { width: 26px; height: 26px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 12px; font-weight: 500; flex-shrink: 0; margin-top: 1px; }
+.step-num.sweet { background: var(--pink); color: var(--pink-deep); }
+.step-num.savory { background: var(--teal); color: var(--teal-deep); }
+.step-text { font-size: 14px; line-height: 1.6; color: var(--brown); }
+.nutri-row { display: grid; grid-template-columns: repeat(4,1fr); gap: 8px; margin-bottom: 20px; }
+.nutri-card { background: var(--white); border-radius: var(--radius-sm); border: 1px solid var(--border); padding: 10px; text-align: center; }
+.nutri-val { font-size: 16px; font-weight: 500; }
+.nutri-label { font-size: 10px; color: var(--gray); margin-top: 2px; }
+.btn-row { display: flex; gap: 10px; margin-bottom: 30px; }
+.btn { flex: 1; padding: 12px; border-radius: var(--radius-sm); font-size: 13px; font-weight: 500; cursor: pointer; font-family: 'DM Sans', sans-serif; border: 1px solid var(--border); background: var(--white); color: var(--brown); transition: all .2s; }
+.btn.primary-teal { background: var(--teal-dark); color: var(--white); border-color: var(--teal-dark); }
+.btn.primary-pink { background: var(--pink-dark); color: var(--white); border-color: var(--pink-dark); }
+.cook-mode { display: none; position: fixed; inset: 0; background: var(--white); z-index: 200; flex-direction: column; }
+.cook-mode.open { display: flex; }
+.cook-header { padding: 16px 20px; display: flex; align-items: center; justify-content: space-between; border-bottom: 1px solid var(--border); }
+.cook-close { background: none; border: none; font-size: 22px; cursor: pointer; color: var(--gray); }
+.cook-title { font-size: 14px; font-weight: 500; flex: 1; text-align: center; }
+.cook-progress { height: 4px; background: var(--border); }
+.cook-progress-fill { height: 100%; transition: width .4s; }
+.cook-progress-fill.sweet { background: var(--pink-dark); }
+.cook-progress-fill.savory { background: var(--teal-dark); }
+.cook-body { flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 30px 24px; text-align: center; }
+.cook-step-num { font-size: 13px; font-weight: 500; color: var(--gray); margin-bottom: 12px; }
+.cook-step-text { font-family: 'Fraunces', serif; font-size: 22px; line-height: 1.5; color: var(--brown); max-width: 400px; }
+.cook-emoji { font-size: 60px; margin-bottom: 20px; }
+.cook-nav { padding: 20px 24px 40px; display: flex; gap: 12px; }
+.cook-btn { flex: 1; padding: 14px; border-radius: var(--radius-sm); font-size: 14px; font-weight: 500; cursor: pointer; font-family: 'DM Sans', sans-serif; border: 1px solid var(--border); background: var(--white); color: var(--brown); }
+.cook-btn.next-teal { background: var(--teal-dark); color: var(--white); border-color: var(--teal-dark); }
+.cook-btn.next-pink { background: var(--pink-dark); color: var(--white); border-color: var(--pink-dark); }
+.cook-done { text-align: center; padding: 30px 24px; }
+.cook-done h2 { font-size: 28px; margin-bottom: 8px; }
+.cook-done p { font-size: 15px; color: var(--gray); }
+.frigo-wrap { padding: 20px; max-width: 600px; margin: 0 auto; padding-bottom: 100px; }
+.frigo-title { font-size: 20px; font-weight: 600; margin-bottom: 6px; }
+.frigo-sub { font-size: 14px; color: var(--gray); margin-bottom: 16px; }
+.frigo-input-wrap { background: var(--white); border-radius: var(--radius); border: 1px solid var(--border); padding: 14px; margin-bottom: 14px; }
+.frigo-input-wrap p { font-size: 13px; color: var(--gray); margin-bottom: 8px; }
+.frigo-input-wrap textarea { width: 100%; min-height: 80px; border: 1px solid var(--border); border-radius: var(--radius-sm); padding: 10px 12px; font-size: 14px; font-family: 'DM Sans', sans-serif; color: var(--brown); background: var(--cream); resize: vertical; outline: none; }
+.mode-cards { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 8px; margin-bottom: 14px; }
+.mode-card { background: var(--white); border: 1px solid var(--border); border-radius: var(--radius-sm); padding: 10px; cursor: pointer; transition: all .2s; text-align: center; }
+.mode-card.selected { border: 2px solid var(--teal-dark); background: var(--teal); }
+.mode-card h4 { font-size: 12px; font-weight: 500; margin-bottom: 2px; }
+.mode-card p { font-size: 10px; color: var(--gray); }
+.mode-card.selected h4, .mode-card.selected p { color: var(--teal-deep); }
+.frigo-btn { width: 100%; padding: 14px; border-radius: var(--radius-sm); background: var(--teal-dark); color: var(--white); border: none; font-size: 14px; font-weight: 500; cursor: pointer; font-family: 'DM Sans', sans-serif; }
+.lola-bubble { background: var(--white); border: 1px solid var(--border); border-radius: var(--radius); padding: 14px 16px; margin-bottom: 16px; display: flex; gap: 12px; align-items: flex-start; }
+.lola-icon { font-size: 28px; flex-shrink: 0; }
+.lola-text { font-size: 13px; color: var(--gray); line-height: 1.5; }
+.lola-name { font-size: 11px; font-weight: 500; color: var(--teal-deep); margin-bottom: 3px; }
+.empty { text-align: center; padding: 40px 20px; color: var(--gray); }
+.empty .big { font-size: 48px; margin-bottom: 10px; }
+.empty p { font-size: 14px; }
+.kids-mode .cook-step-text { font-size: 26px; }
+.kids-mode .cook-emoji { font-size: 80px; }
+</style>
+</head>
+<body>
+  <header class="app-header">
+  <div class="logo">
+    <span class="logo-paw">🐾</span>
+    <h1>LolaSottoTavolo</h1>
+  </div>
+  <div class="header-search">
+    <input class="search-input" type="text" placeholder="Cerca..." id="searchInput" oninput="renderGrid()">
+  </div>
+</header>
+
+<nav class="nav-tabs">
+  <button class="nav-tab active" onclick="switchTab('libreria')">Ricette</button>
+  <button class="nav-tab" onclick="switchTab('frigo')">🧊 Cosa ho in frigo?</button>
+</nav>
+
+<div id="tab-libreria">
+  <div class="filters" id="filters">
+    <button class="chip active-teal" onclick="setFilter('tutti')">Tutte</button>
+    <button class="chip" onclick="setFilter('salato')">🥘 Salate</button>
+    <button class="chip" onclick="setFilter('dolce')">🍰 Dolci</button>
+    <button class="chip" onclick="setFilter('vegano')">🌿 Vegane</button>
+    <button class="chip" onclick="setFilter('facile')">⭐ Facili</button>
+  </div>
+  <div class="grid-wrap">
+    <div class="recipe-grid" id="recipeGrid"></div>
+  </div>
+</div>
+
+<div id="tab-frigo" style="display:none">
+  <div class="frigo-wrap">
+    <div class="lola-bubble">
+      <span class="lola-icon">🐾</span>
+      <div>
+        <div class="lola-name">Lola dice...</div>
+        <div class="lola-text">Dimmi cosa avete in cucina e vi trovo la ricetta perfetta! Anche io mi siedo sotto al tavolo sperando in qualcosa di buono 🐶</div>
+      </div>
+    </div>
+    <h2 class="frigo-title">Cosa hai in casa?</h2>
+    <p class="frigo-sub">Scrivi gli ingredienti separati da virgola</p>
+    <div class="frigo-input-wrap">
+      <p>Ingredienti disponibili:</p>
+      <textarea id="fridgeInput" placeholder="es: uova, limone, farina, burro..."></textarea>
+    </div>
+    <div class="mode-cards">
+      <div class="mode-card selected" id="mode-entrambe" onclick="selectMode('entrambe')">
+        <h4>Tutto</h4>
+        <p>Ricettario + idee Claude</p>
+      </div>
+      <div class="mode-card" id="mode-libro" onclick="selectMode('libro')">
+        <h4>Solo ricettario</h4>
+        <p>Le nostre 29 ricette</p>
+      </div>
+      <div class="mode-card" id="mode-claude" onclick="selectMode('claude')">
+        <h4>Solo Claude</h4>
+        <p>Ricette nuove</p>
+      </div>
+    </div>
+    <button class="frigo-btn" onclick="suggestRecipe()">Trova la ricetta 🐾</button>
+  </div>
+</div>
+
+<div class="detail-view" id="detailView">
+  <div class="detail-hero" id="detailHero">
+    <button class="detail-back" onclick="closeDetail()">← Torna</button>
+    <span id="detailEmoji"></span>
+  </div>
+  <div class="detail-body">
+    <h2 class="detail-title" id="detailTitle"></h2>
+    <div class="detail-meta" id="detailMeta"></div>
+    <div class="detail-source" id="detailSource"></div>
+    <div class="section-label">Ingredienti</div>
+    <div class="pill-list" id="detailIngr"></div>
+    <div class="section-label">Preparazione</div>
+    <div class="steps-list" id="detailSteps"></div>
+    <div id="detailNutriWrap" style="display:none">
+      <div class="section-label">Valori nutrizionali (per porzione)</div>
+      <div class="nutri-row" id="detailNutri"></div>
+    </div>
+    <div class="btn-row">
+      <button class="btn" id="kidsBtn" onclick="toggleKids()">🧒 Versione bimbi</button>
+      <button class="btn primary-teal" id="cookBtn" onclick="startCooking()">Inizia a cucinare →</button>
+    </div>
+  </div>
+</div>
+
+<div class="cook-mode" id="cookMode">
+  <div class="cook-header">
+    <button class="cook-close" onclick="closeCooking()">✕</button>
+    <div class="cook-title" id="cookTitle"></div>
+    <div style="width:32px"></div>
+  </div>
+  <div class="cook-progress">
+    <div class="cook-progress-fill" id="cookProgress"></div>
+  </div>
+  <div class="cook-body" id="cookBody"></div>
+  <div class="cook-nav" id="cookNav"></div>
+</div>
+<script>
+const RICETTE = [
+  {id:1,nome:"Pasta con asparagi, uova strapazzate e ricotta",emoji:"🍝",tipo:"salato",difficolta:"Media",tempo:"30 min",porzioni:"4",fonte:"Luisa Ciffolilli – Inoltre",ingredienti:["400g asparagi","350g spaghetti","3 cucchiai burro","80g parmigiano grattugiato","4 uova","sale e pepe","200g ricotta fresca"],passi:["Lavate e tagliate gli asparagi a tocchetti, mettete da parte le punte.","Cuocete la pasta al dente tenendo da parte un bicchiere di acqua di cottura.","Sciogliete metà burro in padella con un po' di acqua di cottura.","Rompete le uova nella padella e cuocete strapazzandole. Unite la pasta, gli asparagi e la crema di burro con parmigiano, sale e pepe.","Servite con una quenelle di ricotta sopra."]},
+  {id:2,nome:"Biscotti di ceci e zucca",emoji:"🍪",tipo:"dolce vegano",difficolta:"Facile",tempo:"35 min",porzioni:"20",fonte:"Luisa Ciffolilli – Inoltre",ingredienti:["100g mandorle","125g ceci cotti","100g zucca cotta al forno","2 cucchiai cacao amaro","20g cioccolato fondente sciolto","70ml latte vegetale","100g farina di avena","1 cucchiaino lievito","2 cucchiai olio d'oliva"],passi:["Frullate le mandorle, i ceci, la zucca, il cacao, il cioccolato sciolto e il latte vegetale.","Aggiungete la farina, il lievito e l'olio. Amalgamate bene.","Formate un panetto e dividetelo in palline uguali.","Adagiate su teglia con carta forno e appiattite con il fondo di un bicchiere.","Cuocete a 180°C per 25 minuti."]},
+  {id:3,nome:"Biscotti con albicocche, anacardi e cioccolato bianco",emoji:"🍪",tipo:"dolce",difficolta:"Media",tempo:"50 min",porzioni:"20",fonte:"Luisa Ciffolilli – Inoltre",ingredienti:["30g cioccolato bianco in polvere","40g anacardi tostati in polvere","90g burro ammorbidito","90g zucchero di canna","1 uovo","160g farina 00","50g albicocche secche","30g anacardi tostati tritati","10g semi di papavero","1 pizzico sale"],passi:["Mescolate le polveri di cioccolato bianco, anacardi, zucchero e burro.","Unite l'uovo, la farina e il sale. Incorporate le albicocche, gli anacardi e i semi di papavero.","Appiattite l'impasto a mezzo centimetro, fatelo riposare in congelatore per 30 minuti.","Ritagliate con la forma preferita. Cuocete a 160°C per 18 minuti."]},
+  {id:4,nome:"Semifreddo fichi e noci",emoji:"🍨",tipo:"dolce",difficolta:"Media",tempo:"20 min + 6h",porzioni:"6",fonte:"Luisa Ciffolilli – Inoltre",ingredienti:["250g ricotta","100g zucchero","250ml panna da montare","buccia di un limone","5 fichi maturi","50g noci tritate","6 foglie menta fresca"],passi:["In una ciotola mescolate ricotta, zucchero, panna e buccia del limone. Montate con le fruste fino a una crema soffice.","Sbucciate i fichi, tagliateli a pezzetti e aggiungeteli con le noci.","Versate in 6 stampini e lasciate in freezer almeno 6 ore.","Per servire, sformate e decorate con menta fresca e un fico a fettine."]},
+  {id:5,nome:"Torta greca al limone e mirtilli",emoji:"🎂",tipo:"dolce",difficolta:"Media",tempo:"45 min",porzioni:"6",fonte:"Luisa Ciffolilli – Inoltre",ingredienti:["2 uova","300ml panna fresca","100g zucchero","300g pasta fillo","200g burro fuso","scorza di un limone","125g mirtilli","zucchero a velo"],passi:["Sbattete uova, panna, zucchero e scorza di limone fino a un composto omogeneo.","Stendete un foglio di pasta fillo sulla teglia imburrata. Ripetete con altri fogli disponendoli in cerchio.","Versate il composto, aggiungete i mirtilli e coprite con l'ultimo strato di fillo.","Cuocete a 180°C per circa 15 minuti. Sfornate, fate intiepidire e cospargete di zucchero a velo."]},
+  {id:6,nome:"Torta all'arancia con crema all'arancia",emoji:"🍊",tipo:"dolce",difficolta:"Media",tempo:"55 min",porzioni:"8",fonte:"Luisa Ciffolilli – Inoltre",ingredienti:["3 uova","150g zucchero","80ml olio di semi","90ml succo arancia","buccia di un'arancia","200g farina 00","1 bustina lievito","2 cucchiai zucchero (crema)","2 cucchiai amido di mais","220ml succo d'arancia (crema)"],passi:["Sbattete le uova con lo zucchero fino a renderle spumose. Aggiungete olio, succo e buccia d'arancia.","Incorporate farina e lievito. Versate in uno stampo foderato e cuocete a 175°C per 40 minuti.","Per la crema: mescolate zucchero, amido e succo d'arancia in un pentolino. Cuocete mescolando finché si addensa.","Tagliate la torta a metà, spalmate la crema, ricomponete e spolverate di zucchero a velo."]},
+  {id:7,nome:"Vellutata di piselli, menta e basilico",emoji:"🥣",tipo:"salato vegano",difficolta:"Facile",tempo:"25 min",porzioni:"6",fonte:"Luisa Ciffolilli – Inoltre",ingredienti:["500g piselli freschi","5 spicchi aglio","5 scalogni","4 cucchiai olio d'oliva","750ml brodo vegetale","menta fresca","basilico fresco","100g feta sbriciolata","4 fette pane","scorza e succo di 2 limoni","sale e pepe"],passi:["In un tegame fate soffriggere scalogno con aglio e olio.","Aggiungete i piselli, il brodo, le erbe e il sale. Portate a bollore e cuocete 7 minuti.","Frullate fino a una consistenza cremosa.","Tostate il pane, strofinatelo con aglio e tagliatelo a cubetti.","Completate con crostini, feta, menta, scorza e succo di limone, pepe e olio."]},
+  {id:8,nome:"Torta all'arancia e olio d'oliva",emoji:"🍰",tipo:"dolce",difficolta:"Facile",tempo:"45 min",porzioni:"8",fonte:"Luisa Ciffolilli – Inoltre",ingredienti:["2 arance con buccia edibile","3 uova","125g zucchero","80ml olio d'oliva","1 cucchiaio miele","130g farina di mais fine","60g amido di mais","2 cucchiaini lievito","1 pizzico sale","succo di un'arancia (bagna)","60g zucchero (bagna)","2 baccelli cardamomo"],passi:["Lavate le arance, tagliatele a pezzi e frullatele con la buccia fino a una purea.","Sbattete le uova con lo zucchero, aggiungete olio e miele.","Incorporate la purea di arancia, le farine, il lievito e il sale.","Versate nella tortiera e cuocete circa 35 minuti a 175°C.","Fate scaldare succo d'arancia, zucchero e cardamomo. Versate la bagna sulla torta tiepida."]},
+  {id:9,nome:"Focaccia dolce all'uva fragola",emoji:"🍇",tipo:"dolce vegano",difficolta:"Media",tempo:"2 ore",porzioni:"8",fonte:"Luisa Ciffolilli – Inoltre",ingredienti:["5g lievito di birra","200ml acqua","4 cucchiai olio","400g farina tipo 0","900g uva fragola","6 cucchiai zucchero semolato"],passi:["Sciogliete il lievito nell'acqua, aggiungete olio e farina e mescolate.","Lasciate riposare 15 minuti, poi impastate per 10 minuti fino a una palla liscia.","Lasciate lievitare fino al raddoppio (circa 1 ora).","Stendete due terzi su teglia unta. Distribuite metà degli acini, cospargete con 3 cucchiai di zucchero e olio.","Coprite con il resto della pasta, distribuite gli acini rimasti e lo zucchero. Infornate a 190°C per 45 minuti."]},
+  {id:10,nome:"Couscous con pollo, zucchine, pinoli e uvetta",emoji:"🫕",tipo:"salato",difficolta:"Media",tempo:"45 min",porzioni:"4",fonte:"Luisa Ciffolilli – Inoltre",ingredienti:["4 zucchine","grani cardamomo","basilico","scorza di limone","mezza cipolla","2 spicchi aglio","zenzero fresco","semi di zucca","uvetta","2 bicchieri brodo vegetale","2 bicchieri couscous","petti di pollo","pinoli"],passi:["Scaldate olio con cardamomo, scorza di limone e basilico. Marinate il pollo nell'olio profumato per 1 ora.","Soffriggete cipolla e aglio. Aggiungete semi di zucca, uvetta, pinoli e zucchine a rondelle.","Cuocete le zucchine per 15 minuti aggiungendo gradualmente il brodo.","Preparate il couscous seguendo le istruzioni sulla scatola.","Grigliate il pollo a striscioline. Servite il couscous con il pollo e le zucchine."]},
+  {id:11,nome:"Trofie al sugo di pane e noci",emoji:"🍝",tipo:"salato",difficolta:"Facile",tempo:"25 min",porzioni:"4",fonte:"Luisa Ciffolilli – Inoltre",ingredienti:["300g trofie","50g pane bianco raffermo","100ml latte intero","150g noci sgusciate","150ml olio d'oliva","2 spicchi aglio","3 cucchiai grana grattugiato","pepe macinato","sale","scorza e succo di limone","origano fresco"],passi:["Spezzettate il pane, versate il latte e lasciatelo ammollare per 10 minuti.","Frullate con noci, olio, aglio, formaggio, sale, pepe, scorza e succo di limone. Salsa abbastanza liscia.","Cuocete le trofie in acqua salata. Raccogliete 100ml di acqua di cottura.","Scolate la pasta e mettetela in padella con la salsa e l'acqua di cottura.","Aggiungete origano e servite con un filo d'olio."]},
+  {id:12,nome:"Blondies ai datteri e noci",emoji:"🍫",tipo:"dolce",difficolta:"Facile",tempo:"40 min",porzioni:"12",fonte:"Luisa Ciffolilli – Inoltre",ingredienti:["60g noci pecan","60g noci tostate","110g burro fuso","150g zucchero di canna","1 uovo","scorza di un'arancia","120g farina 0","1 cucchiaino cannella e cardamomo","1 cucchiaino lievito","1 pizzico sale","15 datteri a pezzetti"],passi:["Preriscaldate il forno a 180°C.","Tostate le noci in padella per 3 minuti, sminuzzatele.","Mescolate burro fuso con lo zucchero. Aggiungete l'uovo, la buccia d'arancia.","Aggiungete farina, spezie, lievito e sale. Incorporate datteri e noci.","Versate in teglia foderata e cuocete per 25 minuti. Lasciate raffreddare e tagliate a quadrotti."]},
+  {id:13,nome:"Gelato all'uva, banana e cioccolato",emoji:"🍦",tipo:"dolce vegano",difficolta:"Facile",tempo:"15 min + 3h",porzioni:"8",fonte:"Luisa Ciffolilli – Inoltre",ingredienti:["1 grappolo d'uva senza semi","3 cucchiai yogurt bianco","2 banane mature","2 cucchiai cacao","3 cucchiai cocco grattugiato"],passi:["Lavate l'uva e disponete gli acini su una teglia con carta forno, leggermente distanziati.","Frullate yogurt, banane e cacao fino a una consistenza liscia.","Versate il composto sopra gli acini, coperti completamente.","Spolverate con cocco grattugiato. Mettete in freezer per 2-3 ore.","Otterrete una grossa tavoletta da tagliare a spicchi e servire."]},
+  {id:14,nome:"Torta di mele con pasta fillo",emoji:"🍎",tipo:"dolce",difficolta:"Media",tempo:"60 min",porzioni:"6",fonte:"Luisa Ciffolilli – Inoltre",ingredienti:["50g pasta fillo","50g semola","80g burro fuso","80g cocco grattugiato","30g zucchero","3 uova","80ml latte","80ml olio","zucchero vanigliato","1 mela","1 cucchiaino lievito","acqua, zucchero, miele, cannella (sciroppo)"],passi:["Tagliate la pasta fillo in strisce e disponetele in una tortiera. Unite semola, cocco e burro.","Tagliate la mela a spicchi sottili e disponetela sulla pasta.","Sbattete uova, latte, olio e lievito. Distribuite bene sulla torta.","Infornate a 180°C per 40 minuti.","Fate bollire acqua, zucchero, miele e cannella. Versate lo sciroppo caldo sulla torta cotta."]},
+  {id:15,nome:"Palline dolci di carota e cioccolato",emoji:"🍡",tipo:"dolce vegano",difficolta:"Facile",tempo:"20 min",porzioni:"8",fonte:"Luisa Ciffolilli – Inoltre",ingredienti:["bucce di 6 carote","60g noci","1 cucchiaino olio di cocco","cioccolato bianco sciolto","nocciole tritate","1 dattero"],passi:["Mettete in ammollo il dattero per 10 minuti.","Frullate le bucce di carota con noci, olio di cocco, dattero e cannella.","Formate delle palline. Se l'impasto è troppo secco aggiungete un po' di olio di cocco.","Passatele nel cioccolato bianco sciolto a bagnomaria poi nelle nocciole tritate.","Infilzate con bastoncini da cucina e servite."]},
+  {id:16,nome:"Panzanella di prosciutto e melone",emoji:"🥗",tipo:"salato",difficolta:"Facile",tempo:"20 min + 30 min",porzioni:"4",fonte:"Luisa Ciffolilli – Inoltre",ingredienti:["250g pane raffermo","mezza cipolla rossa","mezzo melone maturo","un cetriolo","basilico fresco","olio extravergine","aceto di vino rosso","sale e pepe","8 fette prosciutto crudo"],passi:["Spezzettate il pane e copritelo con acqua calda.","Affettate la cipolla e tenetela in acqua fredda per 10 minuti.","Sbucciate cetriolo e melone, tagliate a cubetti.","Strizzate il pane, sbriciolatelo e unite cetriolo, cipolla, melone, basilico, sale, pepe, olio e aceto.","Mettete in frigo per 30 minuti. Sistemate il prosciutto sopra e servite."]},
+  {id:17,nome:"Nugget vegetariani",emoji:"🥦",tipo:"salato vegano",difficolta:"Facile",tempo:"30 min",porzioni:"4",fonte:"Luisa Ciffolilli – Inoltre",ingredienti:["240g fagioli cannellini cotti","1 patata media lessa","1 spicchio d'aglio","1 uovo","2 cucchiai amido di mais","sale e pepe","olio d'oliva","maionese, yogurt greco, curcuma, semi di sesamo (salsa)"],passi:["Frullate fagioli, patata, aglio, uovo, amido, sale e pepe. Formate piccole crocchette schiacciate.","Cuocetele in padella con un cucchiaio d'olio a fuoco caldo.","Coprite col coperchio e dopo 3 minuti giratele. Cuocete altri 3 minuti.","Per la salsa mescolate maionese, yogurt e curcuma. Aggiungete i semi di sesamo.","Servite i nugget con la salsa."]},
+  {id:18,nome:"Insalata di alga kombu",emoji:"🥬",tipo:"salato vegano",difficolta:"Media",tempo:"30 min + 2h",porzioni:"2",fonte:"Luisa Ciffolilli – Inoltre",ingredienti:["2 fogli di alga kombu","2 cucchiai semi di sesamo","1 cipollotto fresco","1 spicchio d'aglio","2 cucchiai salsa di soia","sale","1 cucchiaio zucchero","1 cucchiaio aceto"],passi:["Fate bollire l'alga kombu per un paio d'ore. Scolatela bene.","Tagliatela a listarelle, arrotolatela e tagliatela ancora a listarelle.","Tostate i semi di sesamo.","Mettete l'alga in una ciotola con cipollotto, aglio, zucchero, sale, sesamo, salsa di soia e aceto.","Mescolate e servite, accompagnata con riso bianco."]},
+  {id:19,nome:"Plumcake al miele e polline",emoji:"🍞",tipo:"dolce",difficolta:"Facile",tempo:"1h 20 min",porzioni:"8",fonte:"Luisa Ciffolilli – Inoltre",ingredienti:["160g zucchero","200g miele","6 uova","scorza di un limone","1 pizzico sale","300g farina di mais fioretto","16g lievito","200g farina di mandorle","150g olio di semi","100g yogurt bianco","100g polline"],passi:["Lavorate le uova con lo zucchero, il sale e la scorza di limone. Aggiungete 100g di miele.","Setacciate le farine con il lievito e unite al composto poco alla volta.","Aggiungete yogurt, olio e polline. Mescolate bene.","Versate nello stampo foderato e cuocete in forno a 180°C per circa 1 ora e 15 minuti.","Quando tiepido, spennellate la superficie con i restanti 100g di miele caldo."]},
+  {id:20,nome:"Insalata di bulgur, fagioli cannellini e prezzemolo",emoji:"🥗",tipo:"salato vegano",difficolta:"Facile",tempo:"25 min",porzioni:"4",fonte:"Luisa Ciffolilli – Inoltre",ingredienti:["100g bulgur","60ml olio d'oliva","30g mandorle tritate","prezzemolo","50g cipollotto affettato","400g fagioli cannellini","mezzo limone","pepe, cumino, sale"],passi:["Mettete il bulgur in una pentola con 100ml di acqua fredda, portate a bollore. Coprite e lasciate riposare 10 minuti.","In padella con l'olio caldo, friggete le mandorle per 5 minuti. Lasciate raffreddare.","Sgranate il bulgur con una forchetta e lasciatelo raffreddare.","Unite bulgur, mandorle con il loro olio, fagioli, cipollotto, prezzemolo, succo di limone, pepe, cumino e sale.","Mescolate bene e servite."]},
+  {id:21,nome:"Noodles teriyaki con verdure e mazzancolle",emoji:"🍜",tipo:"salato",difficolta:"Facile",tempo:"25 min",porzioni:"2",fonte:"Hellofresh – Box ricette",ingredienti:["mazzancolle","noodles","carote","zucchine","cipollotto","salsa di soia","salsa teriyaki","semi di sesamo","zenzero","aglio","olio d'oliva"],passi:["Pelate e tagliate le carote a bastoncini sottili. Affettate il cipollotto e la zucchina a rondelle.","Scaldate una padella a fuoco medio con un filo d'olio. Rosolate aglio sbucciato e carote per 1-2 minuti.","Aggiungete zucchine, cipollotto e mazzancolle. Cuocete per 7-8 minuti mescolando.","Mescolate salsa di soia, zenzero e zucchero. Unite la salsa teriyaki.","Lessate i noodles, scolateli e unite alle verdure con la salsa. Guarnite con semi di sesamo e cipollotto verde."],nutri:{kcal:461,prot:22,carb:62,grassi:12}},
+  {id:22,nome:"Crescioni con spinaci e ricotta",emoji:"🫓",tipo:"salato",difficolta:"Facile",tempo:"20 min",porzioni:"2",fonte:"Hellofresh – Box ricette",ingredienti:["2 piadine","spinaci freschi","ricotta","Grana Padano","uovo","noce moscata","sale e pepe","olio d'oliva"],passi:["Scaldate un filo d'olio in una padella. Unite gli spinaci e cuocete per 2-3 minuti fino ad appassire.","Trasferite gli spinaci in una ciotola con la ricotta. Aggiungete Grana Padano, sale, pepe e noce moscata a piacere.","Disponete il ripieno su metà di ogni piadina. Ripiegate la piadina su quella inferiore.","Scaldate in padella antiaderente 2 minuti per lato, finché saranno dorate.","Tagliate i crescioni a spicchi e servite."],nutri:{kcal:217,prot:21,carb:9,grassi:9}},
+  {id:23,nome:"Rice bowl con macinato stile Oriente",emoji:"🍚",tipo:"salato",difficolta:"Facile",tempo:"25 min",porzioni:"2",fonte:"Hellofresh – Box ricette",ingredienti:["riso jasmine","macinato di manzo","mix di carote e cavolo","cetriolo","peperoncino","salsa hoisin","maionese","aceto","zucchero","olio d'oliva","sale e pepe"],passi:["Raccogliete il riso in un pentolino con l'acqua. Portate a bollore, abbassate il fuoco e cuocete 12 minuti coperto.","Tagliate il cetriolo a rondelle sottili. Condite con aceto, zucchero, sale e pepe. Lasciate macerare.","Scaldate una padella con olio. Rosolate il macinato con sale e pepe per 7-8 minuti mescolando.","Tritate le arachidi e aggiungetele al macinato con la salsa hoisin.","Disponete il riso in piatti fondi con il macinato, il mix di carote e cavolo, il cetriolo e le arachidi."],nutri:{kcal:618,prot:41,carb:62,grassi:22}},
+  {id:24,nome:"Curry di mazzancolle con latte di cocco",emoji:"🍛",tipo:"salato",difficolta:"Media",tempo:"30 min",porzioni:"2",fonte:"Hellofresh – Box ricette",ingredienti:["mazzancolle","riso basmati","zucchine","cipolla","carote","latte di cocco","curry in polvere","pasta di zenzero","prezzemolo","olio d'oliva","sale e pepe"],passi:["Raccogliete il riso in un pentolino con l'acqua. Portate a bollore, abbassate il fuoco e cuocete 12 minuti coperto.","Sbucciate e tagliate la cipolla a cubetti di circa 1 cm. Tritate finemente le carote.","Scaldate olio in padella a fuoco medio. Rosolate cipolla e carote con curry e pasta di zenzero per 1-2 minuti.","Tagliate le zucchine a cubetti. Aggiungete mazzancolle e zucchine e cuocete per 2-3 minuti.","Aggiungete il latte di cocco. Cuocete finché le mazzancolle sono opache al centro. Servite con il riso."],nutri:{kcal:434,prot:19,carb:52,grassi:16}},
+  {id:25,nome:"Rice bowl con funghi, spinaci e uovo fusion",emoji:"🍳",tipo:"salato",difficolta:"Facile",tempo:"25 min",porzioni:"2",fonte:"Hellofresh – Box ricette",ingredienti:["riso jasmine","funghi champignon","spinaci baby","cipollotto","aglio","salsa di soia","uova","salsa sriracha","zucchero","olio d'oliva","sale e pepe"],passi:["Cuocete il riso in un pentolino coperto per 7-8 minuti a fuoco basso.","Pulite i funghi, tagliateli a rondelle sottili. Tritate finemente l'aglio.","Scaldate olio in padella. Rosolate l'aglio, aggiungete i funghi e cuocete per 6-7 minuti.","Unite gli spinaci, salsa di soia, un pizzico di zucchero e sale. Fate appassire per 2-3 minuti.","Rompete le uova in padella con olio e cuocete per 3-4 minuti. Disponete il riso in piatti fondi, unite verdure e uovo. Irrorate con la salsa sriracha."],nutri:{kcal:563,prot:24,carb:75,grassi:17}},
+  {id:26,nome:"Ravioli con crema di zucchine e basilico",emoji:"🟩",tipo:"salato",difficolta:"Facile",tempo:"25 min",porzioni:"2",fonte:"Hellofresh – Box ricette",ingredienti:["ravioli neri","2 zucchine","aglio","basilico fresco","limone","noci","olio d'oliva","sale e pepe","peperoncino"],passi:["Tagliate le zucchine a cubetti di circa 1-2 cm. Scaldate olio in padella con l'aglio e rosolate per 3 minuti.","Eliminate l'aglio. Trasferite 1-2 zucchine nel mixer con basilico, succo di limone e un po' d'acqua. Frullate fino a crema liscia.","Portate a bollore una pentola d'acqua salata per i ravioli. Lessateli seguendo i tempi sulla confezione.","Incorporate la crema di zucchine e mescolate bene.","Distribuite i ravioli nei piatti. Guarnite con le noci spezzettate e il basilico."],nutri:{kcal:380,prot:16,carb:53,grassi:11}},
+  {id:27,nome:"Riso con gamberi e mazzancolle stile Singapore",emoji:"🦐",tipo:"salato",difficolta:"Media",tempo:"30 min",porzioni:"2",fonte:"Hellofresh – Box ricette",ingredienti:["riso jasmine","gamberi","mazzancolle","spinaci baby","pomodori","cipollotto","salsa di soia","pasta di zenzero","lime","olio d'oliva","sale e pepe"],passi:["Cuocete il riso in un pentolino con acqua. Portate a bollore, coprite e fate sobbollire per 7-8 minuti.","Tagliate il cipollotto a rondelle sottili separando la parte verde.","Scaldate olio in padella a fuoco alto. Rosolate gamberi e mazzancolle per 3-5 minuti.","Aggiungete la pasta di zenzero, la salsa di soia, sale e pepe. Cuocete per 4-5 minuti.","Mescolate tutto insieme con le verdure. Accompagnate con il lime."],nutri:{kcal:523,prot:32,carb:78,grassi:8}},
+  {id:28,nome:"Burger con Cheddar, patate e cipolle caramellate",emoji:"🍔",tipo:"salato",difficolta:"Media",tempo:"40 min",porzioni:"2",fonte:"Hellofresh – Box ricette",ingredienti:["2 panini hamburger","hamburger di manzo","Cheddar","patate","cipolla","insalata mista","maionese","sale e pepe","olio d'oliva"],passi:["Preriscaldate il forno a 220°C. Tagliate le patate a spicchi di 2 cm con olio, sale e pepe. Cuocete in forno 30-35 minuti girando a metà cottura.","Sbucciate la cipolla e tagliatela a fette sottili. Rosolatela in padella con olio e un pizzico di zucchero per 5-6 minuti fino a caramellizzazione.","Cuocete gli hamburger in padella 3-4 minuti per lato.","Aggiungete il Cheddar. Abbassate la fiamma, coprite e proseguite per 1-2 minuti.","Spalmate maionese sulla base del panino. Aggiungete l'hamburger, le cipolle, l'insalata e le patate."],nutri:{kcal:524,prot:39,carb:43,grassi:19}},
+  {id:29,nome:"Bagel con funghi Portobello, rucola e cipolle",emoji:"🥯",tipo:"salato",difficolta:"Facile",tempo:"25 min",porzioni:"2",fonte:"Hellofresh – Box ricette",ingredienti:["2 bagel","funghi Portobello","rucola","cipolla","pomodori secchi","ricotta","maionese","farina","olio d'oliva","aceto, sale, olio"],passi:["Eliminate i residui di terriccio dai funghi. Fate 4-5 tagli nel senso della lunghezza. Cuoceteli in padella con olio a fuoco medio-alto per 2-3 minuti.","Rosolate i funghi dalla parte del gambo per altri 3 minuti. Spostate in un piatto.","Sbucciate le cipolle e tagliatele a fette sottili. Passatele nella farina. Friggete in olio abbondante 3-4 minuti finché dorate.","Tritate i pomodori secchi. Mescolateli con maionese, aceto, olio, sale e pepe.","Tagliate i bagel a metà. Spalmate la salsa sulla base. Aggiungete i funghi, le cipolle e la rucola."],nutri:{kcal:447,prot:16,carb:54,grassi:17}}
+];
+  let currentFilter = 'tutti';
+let currentRecipe = null;
+let cookStep = 0;
+let kidsMode = false;
+let fridgeMode = 'entrambe';
+
+function switchTab(t) {
+  document.querySelectorAll('.nav-tab').forEach((el,i)=>el.classList.toggle('active',['libreria','frigo'][i]===t));
+  document.getElementById('tab-libreria').style.display = t==='libreria'?'block':'none';
+  document.getElementById('tab-frigo').style.display = t==='frigo'?'block':'none';
+}
+
+function setFilter(f) {
+  currentFilter = f;
+  document.querySelectorAll('.chip').forEach(el=>{
+    el.classList.remove('active-teal','active-pink');
+    const txt = el.textContent.toLowerCase();
+    const match = (f==='tutti'&&txt.includes('tutte'))||(f==='salato'&&txt.includes('salate'))||(f==='dolce'&&txt.includes('dolci'))||(f==='vegano'&&txt.includes('vegane'))||(f==='facile'&&txt.includes('facili'));
+    if(match) el.classList.add(f==='dolce'?'active-pink':'active-teal');
+  });
+  renderGrid();
+}
+
+function renderGrid() {
+  const q = document.getElementById('searchInput').value.toLowerCase();
+  let filtered = RICETTE.filter(r => {
+    const matchFilter = currentFilter==='tutti' || r.tipo.includes(currentFilter);
+    const matchSearch = !q || r.nome.toLowerCase().includes(q) || r.ingredienti.some(i=>i.toLowerCase().includes(q));
+    return matchFilter && matchSearch;
+  });
+  const grid = document.getElementById('recipeGrid');
+  if(!filtered.length) {
+    grid.innerHTML='<div class="empty"><div class="big">🐾</div><p>Lola non trova nulla... prova un altro ingrediente!</p></div>';
+    return;
+  }
+  grid.innerHTML = filtered.map(r=>{
+    const isSweet = r.tipo.includes('dolce');
+    return `<div class="recipe-card" onclick="showDetail(${r.id})">
+      <div class="card-hero ${isSweet?'sweet':'savory'}">
+        <span class="badge-time">${r.tempo}</span>
+        ${r.emoji}
+        <span class="card-badge badge-easy">${r.difficolta}</span>
+      </div>
+      <div class="card-body">
+        <div class="card-title">${r.nome}</div>
+        <div class="card-meta">${r.porzioni} porz.</div>
+        <div class="card-source">${r.fonte}</div>
+      </div>
+    </div>`;
+  }).join('');
+}
+
+function showDetail(id) {
+  const r = RICETTE.find(x=>x.id===id);
+  if(!r) return;
+  currentRecipe = r;
+  kidsMode = false;
+  const isSweet = r.tipo.includes('dolce');
+  const hero = document.getElementById('detailHero');
+  hero.className = 'detail-hero ' + (isSweet?'sweet':'savory');
+  document.getElementById('detailEmoji').textContent = r.emoji;
+  document.getElementById('detailTitle').textContent = r.nome;
+  document.getElementById('detailMeta').textContent = r.tempo + ' · ' + r.porzioni + ' porzioni · ' + r.tipo;
+  document.getElementById('detailSource').textContent = r.fonte;
+  document.getElementById('detailIngr').innerHTML = r.ingredienti.map(i=>`<span class="pill">${i}</span>`).join('');
+  const cls = isSweet ? 'sweet' : 'savory';
+  document.getElementById('detailSteps').innerHTML = r.passi.map((p,i)=>`
+    <div class="step-item">
+      <span class="step-num ${cls}">${i+1}</span>
+      <span class="step-text">${p}</span>
+    </div>`).join('');
+  const nutri = r.nutri;
+  if(nutri) {
+    document.getElementById('detailNutriWrap').style.display='block';
+    document.getElementById('detailNutri').innerHTML = [
+      {v:nutri.kcal,l:'kcal'},{v:nutri.prot+'g',l:'proteine'},{v:nutri.carb+'g',l:'carboidrati'},{v:nutri.grassi+'g',l:'grassi'}
+    ].map(n=>`<div class="nutri-card"><div class="nutri-val">${n.v}</div><div class="nutri-label">${n.l}</div></div>`).join('');
+  } else {
+    document.getElementById('detailNutriWrap').style.display='none';
+  }
+  const cookBtn = document.getElementById('cookBtn');
+  cookBtn.className = 'btn ' + (isSweet?'primary-pink':'primary-teal');
+  document.getElementById('detailView').classList.add('open');
+  document.getElementById('detailView').scrollTop = 0;
+}
+
+function closeDetail() {
+  document.getElementById('detailView').classList.remove('open');
+  kidsMode = false;
+  document.body.classList.remove('kids-mode');
+}
+
+function toggleKids() {
+  kidsMode = !kidsMode;
+  document.body.classList.toggle('kids-mode', kidsMode);
+  const btn = document.getElementById('kidsBtn');
+  btn.textContent = kidsMode ? '🧒 Modalità normale' : '🧒 Versione bimbi';
+  if(kidsMode && currentRecipe) {
+    const emojis = ['👋','🔪','🥄','🍳','🎉'];
+    document.getElementById('detailSteps').innerHTML = currentRecipe.passi.map((p,i)=>`
+      <div class="step-item">
+        <span class="step-num ${currentRecipe.tipo.includes('dolce')?'sweet':'savory'}" style="font-size:16px">${emojis[i]||'⭐'}</span>
+        <span class="step-text" style="font-size:16px;font-weight:500">${p}</span>
+      </div>`).join('');
+  } else if(currentRecipe) {
+    showDetail(currentRecipe.id);
+  }
+}
+
+function startCooking() {
+  if(!currentRecipe) return;
+  cookStep = 0;
+  document.getElementById('cookTitle').textContent = currentRecipe.nome;
+  const isSweet = currentRecipe.tipo.includes('dolce');
+  document.getElementById('cookProgress').className = 'cook-progress-fill ' + (isSweet?'sweet':'savory');
+  renderCookStep();
+  document.getElementById('cookMode').classList.add('open');
+}
+
+function renderCookStep() {
+  const r = currentRecipe;
+  const total = r.passi.length;
+  const isSweet = r.tipo.includes('dolce');
+  document.getElementById('cookProgress').style.width = ((cookStep+1)/total*100)+'%';
+  const body = document.getElementById('cookBody');
+  if(cookStep >= total) {
+    body.innerHTML = `<div class="cook-done">
+      <div style="font-size:80px;margin-bottom:16px">🎉</div>
+      <h2>Pronto!</h2>
+      <p style="margin-top:8px">Buon appetito da Lola 🐾</p>
+    </div>`;
+    document.getElementById('cookNav').innerHTML = `<button class="cook-btn ${isSweet?'next-pink':'next-teal'}" onclick="closeCooking()">Fine 🐾</button>`;
+    return;
+  }
+  body.innerHTML = `
+    <div class="cook-emoji">${r.emoji}</div>
+    <div class="cook-step-num">Passo ${cookStep+1} di ${total}</div>
+    <div class="cook-step-text">${r.passi[cookStep]}</div>`;
+  document.getElementById('cookNav').innerHTML =
+    (cookStep>0?`<button class="cook-btn" onclick="cookStep--;renderCookStep()">← Indietro</button>`:'') +
+    `<button class="cook-btn ${isSweet?'next-pink':'next-teal'}" onclick="cookStep++;renderCookStep()">${cookStep===total-1?'Fine! 🎉':'Prossimo →'}</button>`;
+}
+
+function closeCooking() {
+  document.getElementById('cookMode').classList.remove('open');
+}
+
+function selectMode(m) {
+  fridgeMode = m;
+  ['entrambe','libro','claude'].forEach(id=>{
+    document.getElementById('mode-'+id).classList.toggle('selected', id===m);
+  });
+}
+
+function suggestRecipe() {
+  const input = document.getElementById('fridgeInput').value.trim();
+  if(!input) return;
+  const nomi = RICETTE.map(r=>r.nome).join(', ');
+  let prompt = '';
+  if(fridgeMode==='libro') {
+    prompt = `Ho in casa: ${input}. Guardando SOLO queste 29 ricette del mio ricettario: ${nomi} — quale mi consigli? Spiega perché è la più adatta e dimmi cosa eventualmente manca. Rispondi in italiano.`;
+  } else if(fridgeMode==='claude') {
+    prompt = `Ho in casa: ${input}. Inventami 2 o 3 ricette originali e gustose che posso fare con questi ingredienti (o con pochissime aggiunte). Non usare le ricette del mio ricettario. Dai un nome creativo a ogni ricetta con ingredienti e passi. Rispondi in italiano.`;
+  } else {
+    prompt = `Ho in casa: ${input}. Prima dimmi quale ricetta del mio ricettario si adatta meglio (scegli tra: ${nomi}) e perché. Poi suggeriscimi anche 1-2 idee extra che posso fare con questi ingredienti, anche fuori dal ricettario. Indica sempre cosa eventualmente manca. Rispondi in italiano.`;
+  }
+  window.sendPrompt ? sendPrompt(prompt) : alert('Copia e incolla nel campo chat: ' + prompt);
+}
+
+renderGrid();
+</script>
+</body>
+</html>
